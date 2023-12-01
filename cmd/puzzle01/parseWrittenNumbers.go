@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-var reWrittenNumber = regexp.MustCompile(`(one|two|three|four|five|six|seven|eight|nine|zero)`)
+var regexWrittenNumber = regexp.MustCompile(`(one|two|three|four|five|six|seven|eight|nine|zero)`)
 
 // Global map so again, not evaluating this every time we call parseLine, basically
 var numberMap = map[string]string{
@@ -31,7 +31,12 @@ func replaceWithDigit(writtenNumber string) string {
 	return newvalue
 }
 
-func parseLine(line string) string {
-	return reWrittenNumber.ReplaceAllStringFunc(line, replaceWithDigit)
+func parseWrittenNumbers(line string) string {
+	
+	// for i := 0; i < len(line); i++ {
+
+	// }
+
+	return regexWrittenNumber.ReplaceAllStringFunc(line, replaceWithDigit)
 }
 

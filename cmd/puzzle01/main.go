@@ -2,31 +2,56 @@ package main
 
 import (
 	"log"
+	"regexp"
+	"strconv"
 
 	"github.com/benallen-dev/advent-of-code-2023/pkg/color"
 )
+
+var regexNotNumber = regexp.MustCompile(`[^0-9]`)
 
 func main() {
 	log.SetPrefix(color.Green + "[ # 01 ] " + color.Reset)
 	log.SetFlags(0)
 
-	testInput := "1fdatwofda3fds4fsdfivefds6fdseveneight9zero"
-
 	// It occurs to me that if I split all these operations into functions
 	// I could parralelise all this by starting a goroutine for each line
 	// thereby improving performance by a factor however many threads we
-	// get to use
+	// get to use, but I also need to synchronously add to sum, which means
+	// mutexes (I think) and I don't want to get into those right now
 
-	foo := parseLine(testInput)
-	foo = collectNumbers(foo)
+	input := readInput("input.txt")
+	sum := int64(0)
 
-	log.Println(foo)
+	for i, line := range input {
+		if (line == "") { // must be the last one
+			continue
+		}
 
-	// For each line of the input
-	//	1. Replace "one", "two" with "1", "2" etc
-	//	2. Collect all the numbers
-	//	3. Take the first and last ones and smush em together
-	//	4. Convert this string to Int
-	//	5. Sum all the numbers
+		// Replace written numbers with digits
+		// TODO: sliding window
+		
+		// Filter out all results that aren't digits
+		foo := regexNotNumber.ReplaceAllLiteralString(line, "")
+		if (len(foo) == 0) {
+			log.Printf(color.Red + "[WARN] " + color.Reset + "Line #%i: '%s' does not contain numbers", i, foo)
+			continue
+		}
 
+
+
+		// Concat the first and last digits together
+		concatted := string(foo[0]) + string(foo[len(foo)-1])
+
+		// Cast from string to int
+		fooInt, err := strconv.ParseInt(concatted, 10, 64)
+		if err != nil {
+			log.Panicf("Could not convert %s to string", foo)
+		}
+
+		// Add to running total
+		sum += fooInt
+	}
+
+	log.Println(sum)
 }
