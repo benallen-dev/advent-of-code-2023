@@ -12,14 +12,10 @@ import (
 var regexNumber = regexp.MustCompile(`[0-9]+`)
 var regexSymbol = regexp.MustCompile(`[^.0-9]`)
 
-func main() {
-	log.SetFlags(0)
-	log.SetPrefix(color.Green + "[ # 03 ] " + color.Reset)
-
+func partOne(lines []string) int {
 	total := 0
-	lines := readInput("input.txt")
-
 	for lineNumber, line := range lines {
+		// Part 1
 		numbers := regexNumber.FindAllStringIndex(line, -1)
 
 		for _, numberIdx := range numbers {
@@ -36,8 +32,6 @@ func main() {
 			lineAfter := lines[nextLineNumber][indexLeft:indexRight]
 
 			if regexSymbol.MatchString(lineBefore) || regexSymbol.MatchString(lineCurrent) || regexSymbol.MatchString(lineAfter) {
-				log.Println("Symbol found!")
-
 				// Extract the number from the line
 				number, err := strconv.Atoi(line[numberIdx[0]:numberIdx[1]])
 				if err != nil {
@@ -45,15 +39,24 @@ func main() {
 				}
 
 				total += number
-				log.Println("Number:", number)
-
 			}
 		}
 	}
+
+	return total
+}
+
+func main() {
+	log.SetFlags(0)
+	log.SetPrefix(color.Green + "[ # 03 ] " + color.Reset)
+
+	lines := readInput("input.txt")
+
+	totalParts := partOne(lines)
 
 	// Find all numbers
 	// if completely surrounded by '.', continue
 	// otherwise add number to running total
 
-	log.Println("Total:", total)
+	log.Println("Total part 1:", totalParts)
 }
