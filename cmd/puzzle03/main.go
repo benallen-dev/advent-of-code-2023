@@ -11,11 +11,11 @@ import (
 
 var regexNumber = regexp.MustCompile(`[0-9]+`)
 var regexSymbol = regexp.MustCompile(`[^.0-9]`)
+var regexStart = regexp.MustCompile(`\*`)
 
 func partOne(lines []string) int {
 	total := 0
 	for lineNumber, line := range lines {
-		// Part 1
 		numbers := regexNumber.FindAllStringIndex(line, -1)
 
 		for _, numberIdx := range numbers {
@@ -46,12 +46,117 @@ func partOne(lines []string) int {
 	return total
 }
 
+func partTwo(lines []string) int {
+
+	totalGears := 0
+	for lineNumber, line := range lines {
+		log.Printf("\nLine %d:", lineNumber)
+
+		// Find the stars * in the line
+		var numbersAbove [][]int
+		//		var numbersCurrent [][]int
+		var numbersBelow [][]int
+
+		if lineNumber > 0 {
+			numbersAbove = regexNumber.FindAllStringIndex(lines[lineNumber-1], -1)
+		}
+
+		if lineNumber < len(lines)-1 {
+			numbersBelow = regexNumber.FindAllStringIndex(lines[lineNumber+1], -1)
+		}
+
+		numbersCurrent := regexNumber.FindAllStringIndex(line, -1)
+
+		stars := regexStart.FindAllStringIndex(line, -1)
+		for _, star := range stars {
+			var adjacentNumbers []int = []int{}
+
+			indexLeft := math.Clamp(star[0]-1, 0, len(line)-1)
+			indexRight := math.Clamp(star[1], 0, len(line)-1)
+
+			log.Println("")
+			log.Printf("Line %d: %v", lineNumber, star)
+
+			for _, numberCurrent := range numbersCurrent {
+
+				// immediately before
+				if numberCurrent[1] == star[0] {
+					stringNumber := line[numberCurrent[0]:numberCurrent[1]]
+					number, err := strconv.Atoi(stringNumber)
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					adjacentNumbers = append(adjacentNumbers, number)
+				}
+
+				// immediately after
+				if numberCurrent[0] == star[1] {
+					stringNumber := line[numberCurrent[0]:numberCurrent[1]]
+					number, err := strconv.Atoi(stringNumber)
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					adjacentNumbers = append(adjacentNumbers, number)
+				}
+			}
+
+			// for each pair in numbersAbove check if any range overlaps with [indexLeft:indexRight]
+			for _, numberAbove := range numbersAbove {
+
+				if math.RangeOverlap(numberAbove[0], numberAbove[1]-1, indexLeft, indexRight) {
+					stringNumber := lines[lineNumber-1][numberAbove[0]:numberAbove[1]]
+					number, err := strconv.Atoi(stringNumber)
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					adjacentNumbers = append(adjacentNumbers, number)
+				}
+			}
+
+			// Now do the same for numbersBelow
+			for _, numberBelow := range numbersBelow {
+
+				if math.RangeOverlap(numberBelow[0], numberBelow[1]-1, indexLeft, indexRight) {
+					stringNumber := lines[lineNumber+1][numberBelow[0]:numberBelow[1]]
+					number, err := strconv.Atoi(stringNumber)
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					adjacentNumbers = append(adjacentNumbers, number)
+				}
+			}
+
+			if lineNumber > 0 && lineNumber < len(lines)-1 {
+
+				log.Println(lines[lineNumber-1][star[0]-3 : star[1]+3])
+				log.Println(line[star[0]-3 : star[1]+3])
+				log.Println(lines[lineNumber+1][star[0]-3 : star[1]+3])
+			}
+			log.Println("Adjecent numbers:", adjacentNumbers)
+
+			if len(adjacentNumbers) == 2 {
+				totalGears += (adjacentNumbers[0] * adjacentNumbers[1])
+			} else {
+				log.Printf("Discarding %v", adjacentNumbers)
+			}
+
+		}
+	}
+
+	return totalGears
+}
+
 func main() {
 	log.SetFlags(0)
 	log.SetPrefix(color.Green + "[ # 03 ] " + color.Reset)
 
 	lines := readInput("input.txt")
 
+	// I'm aware I'm iterating over the lines twice, but O(2n) is still O(n) and there's only 140 lines
 	totalParts := partOne(lines)
 
 	// Find all numbers
@@ -59,4 +164,8 @@ func main() {
 	// otherwise add number to running total
 
 	log.Println("Total part 1:", totalParts)
+
+	totalGears := partTwo(lines)
+
+	log.Println("Total part 2:", totalGears)
 }
