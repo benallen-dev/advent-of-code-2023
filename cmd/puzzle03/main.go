@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/benallen-dev/advent-of-code-2023/pkg/color"
-	"github.com/benallen-dev/advent-of-code-2023/pkg/math"
+	"github.com/benallen-dev/advent-of-code-2023/pkg/mathutil"
 )
 
 var regexNumber = regexp.MustCompile(`[0-9]+`)
@@ -22,11 +22,11 @@ func partOne(lines []string) int {
 
 		for _, numberIdx := range numbers {
 			// Get numbers adjecent to symbols
-			indexLeft := math.Clamp(numberIdx[0]-1, 0, len(line)-1)
-			indexRight := math.Clamp(numberIdx[1]+1, 0, len(line)-1)
+			indexLeft := mathutil.Clamp(numberIdx[0]-1, 0, len(line)-1)
+			indexRight := mathutil.Clamp(numberIdx[1]+1, 0, len(line)-1)
 
-			prevLineNumber := math.Clamp(lineNumber-1, 0, len(lines)-1)
-			nextLineNumber := math.Clamp(lineNumber+1, 0, len(lines)-1)
+			prevLineNumber := mathutil.Clamp(lineNumber-1, 0, len(lines)-1)
+			nextLineNumber := mathutil.Clamp(lineNumber+1, 0, len(lines)-1)
 
 			// For lines 0 and len(lines)-1, there is no line before/after so we just use the current line
 			lineBefore := lines[prevLineNumber][indexLeft:indexRight]
@@ -71,8 +71,8 @@ func partTwo(lines []string) int {
 		for _, star := range stars {
 			var adjacentNumbers []int = []int{}
 
-			indexLeft := math.Clamp(star[0]-1, 0, len(line)-1)
-			indexRight := math.Clamp(star[1], 0, len(line)-1)
+			indexLeft := mathutil.Clamp(star[0]-1, 0, len(line)-1)
+			indexRight := mathutil.Clamp(star[1], 0, len(line)-1)
 
 			for _, numberCurrent := range numbersCurrent {
 
@@ -102,7 +102,7 @@ func partTwo(lines []string) int {
 			// for each pair in numbersAbove check if any range overlaps with [indexLeft:indexRight]
 			for _, numberAbove := range numbersAbove {
 
-				if math.RangeOverlap(numberAbove[0], numberAbove[1]-1, indexLeft, indexRight) {
+				if mathutil.RangeOverlap(numberAbove[0], numberAbove[1]-1, indexLeft, indexRight) {
 					stringNumber := lines[lineNumber-1][numberAbove[0]:numberAbove[1]]
 					number, err := strconv.Atoi(stringNumber)
 					if err != nil {
@@ -116,7 +116,7 @@ func partTwo(lines []string) int {
 			// Now do the same for numbersBelow
 			for _, numberBelow := range numbersBelow {
 
-				if math.RangeOverlap(numberBelow[0], numberBelow[1]-1, indexLeft, indexRight) {
+				if mathutil.RangeOverlap(numberBelow[0], numberBelow[1]-1, indexLeft, indexRight) {
 					stringNumber := lines[lineNumber+1][numberBelow[0]:numberBelow[1]]
 					number, err := strconv.Atoi(stringNumber)
 					if err != nil {

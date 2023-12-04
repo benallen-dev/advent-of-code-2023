@@ -1,4 +1,4 @@
-package math
+package mathutil
 
 func Clamp(value, min, max int) int {
 	if value < min {
