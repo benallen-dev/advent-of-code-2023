@@ -13,6 +13,8 @@ var regexNumber = regexp.MustCompile(`[0-9]+`)
 var regexSymbol = regexp.MustCompile(`[^.0-9]`)
 var regexStart = regexp.MustCompile(`\*`)
 
+var DEBUG = false
+
 func partOne(lines []string) int {
 	total := 0
 	for lineNumber, line := range lines {
@@ -49,13 +51,13 @@ func partOne(lines []string) int {
 func partTwo(lines []string) int {
 
 	totalGears := 0
-	for lineNumber, line := range lines {
-		log.Printf("\nLine %d:", lineNumber)
 
-		// Find the stars * in the line
+	for lineNumber, line := range lines {
+
 		var numbersAbove [][]int
-		//		var numbersCurrent [][]int
 		var numbersBelow [][]int
+
+		numbersCurrent := regexNumber.FindAllStringIndex(line, -1)
 
 		if lineNumber > 0 {
 			numbersAbove = regexNumber.FindAllStringIndex(lines[lineNumber-1], -1)
@@ -65,17 +67,12 @@ func partTwo(lines []string) int {
 			numbersBelow = regexNumber.FindAllStringIndex(lines[lineNumber+1], -1)
 		}
 
-		numbersCurrent := regexNumber.FindAllStringIndex(line, -1)
-
 		stars := regexStart.FindAllStringIndex(line, -1)
 		for _, star := range stars {
 			var adjacentNumbers []int = []int{}
 
 			indexLeft := math.Clamp(star[0]-1, 0, len(line)-1)
 			indexRight := math.Clamp(star[1], 0, len(line)-1)
-
-			log.Println("")
-			log.Printf("Line %d: %v", lineNumber, star)
 
 			for _, numberCurrent := range numbersCurrent {
 
@@ -130,17 +127,18 @@ func partTwo(lines []string) int {
 				}
 			}
 
-			if lineNumber > 0 && lineNumber < len(lines)-1 {
-
-				log.Println(lines[lineNumber-1][star[0]-3 : star[1]+3])
-				log.Println(line[star[0]-3 : star[1]+3])
-				log.Println(lines[lineNumber+1][star[0]-3 : star[1]+3])
+			if DEBUG {
+				if lineNumber > 0 && lineNumber < len(lines)-1 {
+					log.Println(lines[lineNumber-1][star[0]-3 : star[1]+3])
+					log.Println(line[star[0]-3 : star[1]+3])
+					log.Println(lines[lineNumber+1][star[0]-3 : star[1]+3])
+				}
+				log.Println("Adjecent numbers:", adjacentNumbers)
 			}
-			log.Println("Adjecent numbers:", adjacentNumbers)
 
 			if len(adjacentNumbers) == 2 {
 				totalGears += (adjacentNumbers[0] * adjacentNumbers[1])
-			} else {
+			} else if DEBUG {
 				log.Printf("Discarding %v", adjacentNumbers)
 			}
 
@@ -158,14 +156,8 @@ func main() {
 
 	// I'm aware I'm iterating over the lines twice, but O(2n) is still O(n) and there's only 140 lines
 	totalParts := partOne(lines)
-
-	// Find all numbers
-	// if completely surrounded by '.', continue
-	// otherwise add number to running total
-
-	log.Println("Total part 1:", totalParts)
-
 	totalGears := partTwo(lines)
 
+	log.Println("Total part 1:", totalParts)
 	log.Println("Total part 2:", totalGears)
 }
