@@ -3,24 +3,17 @@ package main
 import (
 	"log"
 	"math"
-	"sync"
 
 	"github.com/benallen-dev/advent-of-code-2023/pkg/color"
 )
 
-var (
-	DEBUG = false
-)
-
 func getMatches(card ScratchCard) int {
-
 	matches := 0
 
 	for _, winningNumber := range card.winningNumbers {
 		for _, cardNumber := range card.cardNumbers {
 			if winningNumber == cardNumber {
 				matches += 1
-				break // no need to check the rest of the card numbers
 			}
 		}
 	}
@@ -54,19 +47,14 @@ func main() {
 	}
 
 	log.Println("Part one:", points)
-
-	// Part two, run through the queue
-	// cardCount++ and append winning cards, until queue is empty
-	log.Println(q)
-
+	
+	// Part two, run through the queue, incrementing cardCount and appending winners to the queue
 	cardCount := 0
-	var mu sync.Mutex
 
+	// Go doesn't have a while loop, except it does
 	for len(q) > 0 {
-		// Do this mutex thing so I'm sure stuff happens in order
-		mu.Lock()
-		// Increment cardCount
 		cardCount++
+
 		// Pop the first card from the queue
 		cardId := q[0]
 		q = q[1:]
@@ -77,16 +65,17 @@ func main() {
 		matches := getMatches(card)
 
 		if matches > 0 {
+			// More off-by-one tomfoolery
 			for i := 1; i <= matches; i++ {
 				newCardId := cardId + i
 				q = append(q, newCardId)
 			}
 		}
 
-		log.Println("queue length:", len(q))
-		mu.Unlock()
 	}
 
+	// Turns out that the mutex wasn't necessary, but it also doesn't slow things
+	// down too much. The issue actually stems from having print statements inside
+	// the while loop, that makes everything really slow!
 	log.Println("Part two:", cardCount)
-
 }
