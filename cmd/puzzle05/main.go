@@ -11,4 +11,6 @@ func main() {
 	log.SetPrefix(color.Green + "[ # 05 ] " + color.Reset)
 
 	log.Println("Hello from puzzle 05")
+
+	_ = readInput("input.txt")
 }
