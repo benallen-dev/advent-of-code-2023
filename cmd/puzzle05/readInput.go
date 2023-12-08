@@ -2,55 +2,85 @@ package main
 
 import (
 	"log"
-	"strconv"
-	// "os"
-	// "strings"
-
+	"os"
 	"regexp"
+	"strconv"
+	"strings"
 )
 
-var mapping map[int64]int64
+type PuzzleData struct {
+	seeds                       []int
+	seedToSoilString            []string
+	soilToFertilizerString      []string
+	fertilizerToWaterString     []string
+	waterToLightString          []string
+	lightToTemperatureString    []string
+	temperatureToHumidityString []string
+	humidityToLocationString    []string
+}
 
-func readInput(filename string) []string {
-	// seedsInput := "79 14 55 13"
+var (
+	seedsRegex                 = regexp.MustCompile(`seeds: (.*)\n`)
+	seedToSoilRegex            = regexp.MustCompile(`seed-to-soil map:\n((?:\d+ \d+ \d+\n)+)`)
+	soilToFerilizerRegex       = regexp.MustCompile(`soil-to-fertilizer map:\n((?:\d+ \d+ \d+\n)+)`)
+	fertilizerToWaterRegex     = regexp.MustCompile(`fertilizer-to-water map:\n((?:\d+ \d+ \d+\n)+)`)
+	waterToLightRegex          = regexp.MustCompile(`water-to-light map:\n((?:\d+ \d+ \d+\n)+)`)
+	lightToTemperatureRegex    = regexp.MustCompile(`light-to-temperature map:\n((?:\d+ \d+ \d+\n)+)`)
+	temperatureToHumidityRegex = regexp.MustCompile(`temperature-to-humidity map:\n((?:\d+ \d+ \d+\n)+)`)
+	humidityToLocationRegex    = regexp.MustCompile(`humidity-to-location map:\n((?:\d+ \d+ \d+\n)+)`)
+)
 
-	// Example input from problem statement
-	seed2soilInput := []string{
-		"50 98 2",
-		"52 50 48",
-	}
+func getSeeds(input string) []int {
+	seedString := seedsRegex.FindStringSubmatch(input)
+	seeds := strings.Split(seedString[1], " ")
 
-	// The issue with this is that you can only read the map one way - I think you need to read it both ways
-	seed2soilMapping := map[int]int{}
-
-	for _, mapping := range seed2soilInput {
-		mappingRegex := regexp.MustCompile(`(\d+) (\d+) (\d+)`)
-		mappingMatch := mappingRegex.FindStringSubmatch(mapping)
-
-		source, err := strconv.Atoi(mappingMatch[1])
-		destination, err := strconv.Atoi(mappingMatch[2])
-		amount, err := strconv.Atoi(mappingMatch[3])
+	var parsedSeeds []int
+	for _, seed := range seeds {
+		parsedSeed, err := strconv.Atoi(seed)
 		if err != nil {
-			log.Panic("Cannot convert string to int", err)
+			log.Panic("Cannot convert seed to int", err)
 		}
-
-		log.Println(source, destination, amount)
-
-		for i := 0; i < amount; i++ {
-			seed2soilMapping[source + i] = destination + i
-		}
+		parsedSeeds = append(parsedSeeds, parsedSeed)
 	}
 
-	log.Println(seed2soilMapping)
+	return parsedSeeds
+}
 
-	// 	fileContents, err := os.ReadFile(filename)
-	// 	if err != nil {
-	// 		log.Panic("Cannot read input file from disk", err)
-	// 	}
 
-	// 	lines := strings.Split(string(fileContents), "\n")
-	// 	lines = lines[:len(lines)-1] // Remove the last line because it's empty
+// Takes the input file string and a regex, and returns all mappings for that regex in an array
+func getMapStrings(input string, regex *regexp.Regexp) []string {
+	numbers := regex.FindStringSubmatch(input)[1]
+	numberLines := strings.Split(numbers, "\n")
 
-	// return lines
-	return []string{}
+	return numberLines[:len(numberLines)-1] // truncate last element, which is empty
+}
+
+// Reads the input file and returns the puzzle's input data
+func readInput(filename string) PuzzleData {
+	fileContents, err := os.ReadFile(filename)
+	if err != nil {
+		log.Panic("Cannot read input file from disk", err)
+	}
+
+	input := string(fileContents)
+
+	seeds := getSeeds(input)
+	seedToSoilStrings := getMapStrings(input, seedToSoilRegex)
+	soilToFertilizerStrings := getMapStrings(input, soilToFerilizerRegex)
+	fertilizerToWaterStrings := getMapStrings(input, fertilizerToWaterRegex)
+	waterToLightStrings := getMapStrings(input, waterToLightRegex)
+	lightToTemperatureStrings := getMapStrings(input, lightToTemperatureRegex)
+	temperatureToHumidityStrings := getMapStrings(input, temperatureToHumidityRegex)
+	humidityToLocationStrings := getMapStrings(input, humidityToLocationRegex)
+
+	return PuzzleData{
+		seeds:      seeds,
+		seedToSoilString:            seedToSoilStrings,
+		soilToFertilizerString:      soilToFertilizerStrings,
+		fertilizerToWaterString:     fertilizerToWaterStrings,
+		waterToLightString:          waterToLightStrings,
+		lightToTemperatureString:    lightToTemperatureStrings,
+		temperatureToHumidityString: temperatureToHumidityStrings,
+		humidityToLocationString:    humidityToLocationStrings,
+	}
 }
