@@ -37,15 +37,10 @@ func countWinPermutations(time int, record int, resultChan chan int, wg *sync.Wa
 	resultChan <- wins
 }
 
-func main() {
-	log.SetFlags(0)
-	log.SetPrefix(color.Green + "[ # 06 ] " + color.Reset)
+func getResult(input [][]int) int {
 
 	resultChan := make(chan int)
 	wg := sync.WaitGroup{}
-
-	// Toggle between input1 and input2 to run the different parts
-	input := input2
 
 	for i := 0; i < len(input); i++ {
 		time := input[i][0]
@@ -65,8 +60,17 @@ func main() {
 		margin *= result
 	}
 
-	log.Printf("Margin: %d", margin)
-
+	return margin
 }
 
+func main() {
+	log.SetFlags(0)
+	log.SetPrefix(color.Green + "[ # 06 ] " + color.Reset)
+
+	margin1 := getResult(input1)
+	log.Printf("Part 1: %d", margin1)
+
+	margin2 := getResult(input2)
+	log.Printf("Part 2: %d", margin2)
+}
 
