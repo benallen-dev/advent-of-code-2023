@@ -14,6 +14,16 @@ type Map struct {
 	domains []Domain
 }
 
+type Maps struct {
+	seedToSoilMap Map
+	soilToFertilizerMap Map
+	fertilizerToWaterMap Map
+	waterToLightMap Map
+	lightToTemperatureMap Map
+	temperatureToHumidityMap Map
+	humidityToLocationMap Map
+}
+
 func (m Map) getMapValue(value int) int {
 	for _, domain := range m.domains {
 		if value >= domain.sourceStart && value < domain.sourceStart+domain.size {
@@ -33,4 +43,24 @@ func generateMap(mapping []string) Map {
 	}
 
 	return Map{domains}
+}
+
+func buildMaps(puzzleData PuzzleData) Maps {
+	seedToSoilMap := generateMap(puzzleData.seedToSoilString)
+	soilToFertilizerMap := generateMap(puzzleData.soilToFertilizerString)
+	fertilizerToWaterMap := generateMap(puzzleData.fertilizerToWaterString)
+	waterToLightMap := generateMap(puzzleData.waterToLightString)
+	lightToTemperatureMap := generateMap(puzzleData.lightToTemperatureString)
+	temperatureToHumidityMap := generateMap(puzzleData.temperatureToHumidityString)
+	humidityToLocationMap := generateMap(puzzleData.humidityToLocationString)
+
+	return Maps{
+		seedToSoilMap,
+		soilToFertilizerMap,
+		fertilizerToWaterMap,
+		waterToLightMap,
+		lightToTemperatureMap,
+		temperatureToHumidityMap,
+		humidityToLocationMap,
+	}
 }
