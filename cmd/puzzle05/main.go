@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"sync"
 
 	"github.com/benallen-dev/advent-of-code-2023/pkg/color"
 )
@@ -33,6 +34,20 @@ func part01(seeds []int, maps Maps) int {
 	return lowestLocation
 }
 
+func processRange(start int, end int, maps Maps, resultChannel chan int, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	lowestLocation := 1000000000000000000 // just some big number again
+		for j := start; j <= end; j++ {
+			location := mapSeedToLocation(j, maps)
+			if location < lowestLocation {
+				lowestLocation = location
+			}
+		}
+
+	resultChannel <- lowestLocation
+}
+
 func part02(seeds []int, maps Maps) int {
 
 	// Now the seeds are actually tuples of [start, range]
@@ -40,22 +55,30 @@ func part02(seeds []int, maps Maps) int {
 	// The way to solve it is to iterate and just discard results as you go
 	// instead of storing them all in memory up front
 
+	resultChannel := make(chan int)
+	var wg sync.WaitGroup
+
 	lowestLocation := 1000000000000000000 // just some big number again
 
-	// This method is exceptionally slow and doesn't use all my CPUs
-	// I could split each range into its own goroutine but as this is my first
-	// working solution I'm going to commit this first
 	for i := 0; i < len(seeds); i += 2 {
 		start := seeds[i]
 		end := seeds[i] + seeds[i+1]
 
 		log.Printf("Processing seed range %d to %d", start, end)
 
-		for j := start; j <= end; j++ {
-			location := mapSeedToLocation(j, maps)
-			if location < lowestLocation {
-				lowestLocation = location
-			}
+		wg.Add(1)
+		go processRange(start, end, maps, resultChannel, &wg)
+	}
+
+	go func() {
+		wg.Wait()
+		close(resultChannel)
+	}()
+
+	for result := range resultChannel {
+		log.Printf("Got result: %d", result)
+		if result < lowestLocation {
+			lowestLocation = result
 		}
 	}
 
