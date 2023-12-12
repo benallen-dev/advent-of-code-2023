@@ -7,11 +7,6 @@ import (
 	"strings"
 )
 
-type Hand struct {
-	cards string
-	bid int
-}
-
 func readInput(filename string) []Hand {
 	fileBytes, err := os.ReadFile(filename)
 	if (err != nil) {
