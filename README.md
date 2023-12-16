@@ -4,7 +4,7 @@ Last year I decided I would try advent of code, solved the first two days and th
 
 This year will be different™️!
 
-## Note the odd use of `pacakage main`
+## Note the odd use of `package main`
 
 All cmd/puzzleXX directories are their own `main` package. Luckily Go is smart (apparently) and you can just cd into those directories and `go run .` and everything is scoped to that directory. I was a little worried that puzzle01::parseLine would leak into the main package of puzzle02, but it doesn't.
 
