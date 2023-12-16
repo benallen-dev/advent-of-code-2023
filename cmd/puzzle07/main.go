@@ -42,12 +42,47 @@ func part01(hands []Hand) {
 		total += (idx + 1) * hand.bid
 	}
 
-	log.Println("Total:", total)
+	log.Println("Total part 1:", total)
 }
 
+// This isn't dry but it's a toy program
 func part02(hands []Hand) {
-	// Variant must be determined with J being the same as the highest counted card
-	// Value of J is now 1, not 11
+
+	sort.Slice(hands, func(i, j int) bool {
+		// if i < j return true
+		a := hands[i]
+		b := hands[j]
+
+		if a.Variant(2) <  b.Variant(2) {
+			return true
+		}
+
+		if a.Variant(2) > b.Variant(2) {
+			return false
+		}
+
+		// Variants are equal
+		for i := 0; i < 5; i++ {
+			cardA := string(a.cards[i])
+			cardB := string(b.cards[i])
+
+			valueA := scoreMapPartTwo[cardA]
+			valueB := scoreMapPartTwo[cardB]
+
+			if valueA != valueB {
+				return valueA < valueB
+			}
+		}
+
+		return false
+	})
+
+	total := 0
+	for idx, hand := range hands {
+		total += (idx + 1) * hand.bid
+	}
+
+	log.Println("Total part 2:", total)
 }
 
 func main() {
@@ -57,4 +92,5 @@ func main() {
 	hands := readInput("input.txt")
 
 	part01(hands)
+	part02(hands)
 }

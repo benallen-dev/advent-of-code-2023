@@ -21,6 +21,37 @@ func (h Hand) Variant(day int) Variant {
 		cardmap[string(card)]++
 	}
 
+	if day == 2 {
+		jokers := cardmap["J"]
+		if jokers > 0 {
+			// remove the jokers from the map
+			delete(cardmap, "J")
+
+			// Find the highest card count
+			highestCard := "J" // Js are the lowest card now
+			highestCount := 0
+			for k, v := range cardmap {
+				// if the count is higher, replace the highest card
+				if v > highestCount {
+					highestCard = k
+					highestCount = v
+				}
+				
+				//if the count is equal, only replace the highest card if the value is higher
+				if v == highestCount {
+					if scoreMapPartTwo[k] > scoreMapPartTwo[highestCard] {
+						highestCard = k
+						highestCount = v
+					}
+				}
+			}
+
+			// We now know the highest card and its value
+			// Set the count of the highest card to itself + the jokers
+			cardmap[highestCard] += jokers
+		}
+	}
+
 	switch len(cardmap) {
 	case 1:
 		variant = FiveOfAKind
@@ -50,10 +81,6 @@ func (h Hand) Variant(day int) Variant {
 		variant = Pair
 	default:
 		variant = HighCard
-	}
-
-	if day == 2 {
-		// Do the J thing
 	}
 
 	return variant
