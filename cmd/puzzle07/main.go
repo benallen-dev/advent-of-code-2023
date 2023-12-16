@@ -7,51 +7,54 @@ import (
 	"github.com/benallen-dev/advent-of-code-2023/pkg/color"
 )
 
-func compareScore(a, b Score) int {
-	if a.variant > b.variant {
-		return 1
-	} else if a.variant < b.variant {
-		return -1
-	}
-
-	for i := 0; i < len(a.cardOrder); i++ {
-		if scoreMap[a.cardOrder[i]] > scoreMap[b.cardOrder[i]] {
-			return 1
-		} else if scoreMap[a.cardOrder[i]] < scoreMap[b.cardOrder[i]] {
-			return -1
-		}
-	}
-
-	return 0
-}
-
 func part01(hands []Hand) {
 	sort.Slice(hands, func(i, j int) bool {
-		return compareScore(hands[i].Score(), hands[j].Score()) == 1
+		// if i < j return true
+		a := hands[i]
+		b := hands[j]
+
+		if a.Variant(1) <  b.Variant(1) {
+			return true
+		}
+
+		if a.Variant(1) > b.Variant(1) {
+			return false
+		}
+
+		// Variants are equal
+		for i := 0; i < 5; i++ {
+			cardA := string(a.cards[i])
+			cardB := string(b.cards[i])
+
+			valueA := scoreMap[cardA]
+			valueB := scoreMap[cardB]
+
+			if valueA != valueB {
+				return valueA < valueB
+			}
+		}
+
+		return false
 	})
 
 	total := 0
 	for idx, hand := range hands {
-		log.Println(hand.Score())
-
 		total += (idx + 1) * hand.bid
 	}
 
+	log.Println("Total:", total)
+}
 
-
-	// sort hands based on power
-	// for each hand
-		// value = (idx +1) * bid
-		// total += value
+func part02(hands []Hand) {
+	// Variant must be determined with J being the same as the highest counted card
+	// Value of J is now 1, not 11
 }
 
 func main() {
 	log.SetFlags(0)
 	log.SetPrefix(color.Green + "[ # 07 ] " + color.Reset)
 
-	log.Println("Hello from day 7")
-
-	hands := readInput("input.txt") 
+	hands := readInput("input.txt")
 
 	part01(hands)
 }
