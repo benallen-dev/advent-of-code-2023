@@ -92,7 +92,7 @@ func part02(nodes map[string]Node) {
 
 func main() {
 	log.SetFlags(0)
-	log.SetPrefix(color.Green + "[ # 07 ] " + color.Reset)
+	log.SetPrefix(color.Green + "[ # 08 ] " + color.Reset)
 
 	nodes := readInput("input.txt")
 
