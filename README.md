@@ -68,7 +68,7 @@ func main() {
 
 Also, you can't append a slice to a slice. What you can do is this:
 
-```
+```go
 joinedSlices := append(someSlice, someOtherSlice...)
 ```
 
