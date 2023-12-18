@@ -63,3 +63,13 @@ func main() {
 	}
 }
 ```
+
+### Prepending to a slice is done by exploiting the variadic `append` function
+
+Also, you can't append a slice to a slice. What you can do is this:
+
+```
+joinedSlices := append(someSlice, someOtherSlice...)
+```
+
+As long as both slices contain the same type
