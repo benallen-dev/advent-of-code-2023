@@ -66,10 +66,16 @@ func main() {
 
 ### Prepending to a slice is done by exploiting the variadic `append` function
 
+```go
+// someSlice is of type []int
+someSlice = append([]int{1337}, someSlice...)
+```
+
 Also, you can't append a slice to a slice. What you can do is this:
 
 ```go
+// someSlice and someOtherSlices are the same type []T
 joinedSlices := append(someSlice, someOtherSlice...)
 ```
 
-As long as both slices contain the same type
+As long as both slices contain the same type you're good to go
