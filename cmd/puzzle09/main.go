@@ -60,7 +60,41 @@ func predictNext (elements []int) int {
 
 	// The last element of the first array is the answer
 	return intervals[0][len(intervals[0]) - 1]
+}
+
+func predictPrevious (elements []int) int {
+	// Determine intervals until they're all 0
+	var intervals [][]int
+
+	// Calculate the first set of intervals
+	intervals = append(intervals, elements)
+
+	// While the last set of intervals is not all 0
+	for !allZero(intervals[len(intervals) - 1]) {
+		// Calculate the next set of intervals
+		intervals = append(intervals, calculateIntervals(intervals[len(intervals) - 1]))
+	}
+
+
 	
+
+	for i := len(intervals) - 1; i >= 0; i-- {
+		// If all zeros, add a 0 to the end
+		if allZero(intervals[i]) {
+			intervals[i] = append([]int{0}, intervals[i]...)
+		} else {
+			// Get the first element of the i'th array
+			firstElement := intervals[i][0]
+			// Get the first element of the i+1'th array
+			nextFirstElement := intervals[i + 1][0]
+
+			// prediction + nextFirstElement = firstElement
+			intervals[i] = append([]int{firstElement - nextFirstElement}, intervals[i]...)
+		}
+	}
+
+	// The first element of the first array is the answer
+	return intervals[0][0]
 }
 
 func main() {
@@ -68,19 +102,15 @@ func main() {
 	log.SetFlags(0)
 
 	histories := readInput("input.txt")
-	runningTotal := 0
+	runningTotalNext := 0
+	runningTotalPrevious := 0
 
 	for _, history := range histories {
-		runningTotal += predictNext(history)
+		runningTotalNext += predictNext(history)
+		runningTotalPrevious += predictPrevious(history)
 	}
 
-	log.Println("Part 01:", runningTotal)
-
-
-	// Part 2 is gonna be brutal if they explain step by step
-	// how to solve part 1
-
-
-
+	log.Println("Part 1:", runningTotalNext)
+	log.Println("Part 2:", runningTotalPrevious)
 }
 
