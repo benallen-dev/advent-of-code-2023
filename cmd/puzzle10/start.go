@@ -33,7 +33,7 @@ func getStartTiles(input []string, start Location) (tiles []Location, err error)
 	// First, North
 	northTile, err := getTile(input, north)
 	if err != nil {
-		return nil, err
+//		return nil, err
 	} else {
 		if northTile == '|' || northTile == 'F' || northTile == '7' {
 			startTiles = append(startTiles, north)
@@ -43,7 +43,7 @@ func getStartTiles(input []string, start Location) (tiles []Location, err error)
 	// Second, South
 	southTile, err := getTile(input, south)
 	if err != nil {
-		return nil, err
+//		return nil, err
 	} else {
 		if southTile == '|' || southTile == 'J' || southTile == 'L' {
 			startTiles = append(startTiles, south)
@@ -53,7 +53,7 @@ func getStartTiles(input []string, start Location) (tiles []Location, err error)
 	// Third, East
 	eastTile, err := getTile(input, east)
 	if err != nil {
-		return nil, err
+//		return nil, err
 	} else {
 		if eastTile == '-' || eastTile == 'J' || eastTile == '7' {
 			startTiles = append(startTiles, east)
@@ -63,7 +63,7 @@ func getStartTiles(input []string, start Location) (tiles []Location, err error)
 	// Fourth, West
 	westTile, err := getTile(input, west)
 	if err != nil {
-		return nil, err
+//		return nil, err
 	} else {
 		if westTile == '-' || westTile == 'L' || westTile == 'F' {
 			startTiles = append(startTiles, west)

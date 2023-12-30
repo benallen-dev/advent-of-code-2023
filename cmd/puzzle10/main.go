@@ -1,8 +1,8 @@
 package main
 
 import (
-	"errors"
 	"log"
+	"regexp"
 
 	"github.com/benallen-dev/advent-of-code-2023/pkg/color"
 )
@@ -23,74 +23,13 @@ type Location [2]int
  * S is the starting position of the animal; there is a pipe on this tile, but your sketch doesn't show what shape the pipe has.
  */
 
- // getNextTile takes the input, the current location, and the previous location, and returns the next location
- // It also returns an error if the current tile is invalid or the direction is invalid
-func getNextTile(input []string, location Location, prevLocation Location) (next Location, err error) {
-
-	tile, err := getTile(input, location)
-	if err != nil {
-		return Location{}, err
-	}
-
-	// I'm sure there's a more efficient way of doing this but "verbose and works" is better than "clever and broken"
-
-	// Check if we're coming from NESW
-	if location[0] > prevLocation[0] { // Coming from North
-		switch tile {
-		case '|': // return tile to the south of us
-			return Location{location[0] + 1, location[1]}, nil
-		case 'L':
-			return Location{location[0], location[1] + 1}, nil
-		case 'J':
-			return Location{location[0], location[1] - 1}, nil
-		default:
-			return Location{}, errors.New("Invalid tile from North: " + string(tile))
-		}
-	} else if location[0] < prevLocation[0] { // South
-		switch tile {
-		case '|':
-			return Location{location[0] - 1, location[1]}, nil
-		case 'F':
-			return Location{location[0], location[1] + 1}, nil
-		case '7':
-			return Location{location[0], location[1] - 1}, nil
-		default:
-			return Location{}, errors.New("Invalid tile from South: " + string(tile))
-		}
-	} else if location[1] < prevLocation[1] { // East
-		switch tile {
-		case '-':
-			return Location{location[0], location[1] - 1}, nil
-		case 'L':
-			return Location{location[0] - 1, location[1]}, nil
-		case 'F':
-			return Location{location[0] + 1, location[1]}, nil
-		default:
-			return Location{}, errors.New("Invalid tile from East: " + string(tile))
-		}
-	} else if location[1] > prevLocation[1] { // West
-		switch tile {
-		case '-':
-			return Location{location[0], location[1] + 1}, nil
-		case 'J':
-			return Location{location[0] - 1, location[1]}, nil
-		case '7':
-			return Location{location[0] + 1, location[1]}, nil
-		default:
-			return Location{}, errors.New("Invalid tile from West: " + string(tile))
-		}
-	} else {
-		log.Println("Error getting next tile from", location, "coming from", prevLocation)
-		return Location{}, errors.New("Not coming from NESW")
-	}
-}
-
 func main() {
 	log.SetPrefix(color.Green + "[ # 10 ] " + color.Reset)
 	log.SetFlags(0)
 
-	input := readInput("exampleInputPart2.txt")
-	// input := readInput("input.txt")
+	// input := readInput("exampleInput01.txt")
+	// input := readInput("exampleInputPart2-3.txt")
+	input := readInput("input.txt")
 
 	// Find the start
 	start, err := findStart(input)
@@ -108,7 +47,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 
 	// Part 1: How many tiles in the loop
 	visitedTiles := map[Location]bool{}
@@ -141,12 +79,13 @@ func main() {
 		}
 	}
 
+	// Save the last tile
+	visitedTiles[tilesToVisit[0]] = true
+
 	// At this point we have a map of all visited (loop) tiles
 	// The distance variable holds the max distance - 1 as the loop was broken before the last iteration
 
-	log.Println("Max distance is", distance + 1)
-
-
+	log.Println("Max distance is", distance+1)
 
 	// Part 2: How many tiles enclosed by the loop
 	// Strategy:
@@ -154,5 +93,48 @@ func main() {
 	//	- traverse left
 	//	-	if odd tiles are part of the loopt, the point is contained inside it
 
+	// a | means we're crossing the line
+	// so does F-?J
+	// so does L-?7
+	edgeRegex := regexp.MustCompile(`(\||F-*J|L-*7)`)
+	insidePoints := map[Location]bool{}
+	insideCount := 0
 
+	for linenum, line := range input {
+
+		for pointnum := range line {
+
+			currentLocation := Location{linenum, pointnum}
+			currentIsVisited := visitedTiles[currentLocation]
+
+			if currentIsVisited {
+				continue
+			}
+
+			legitIntersections := [][]int{}
+
+			intersections := edgeRegex.FindAllStringIndex(line[0:pointnum], -1)
+
+			//			log.Println("intersections", intersections)
+
+			for _, intersection := range intersections {
+				if visitedTiles[Location{linenum, intersection[0]}] {
+					// this intersection is legit
+					legitIntersections = append(legitIntersections, intersection)
+				}
+			}
+
+			//			log.Println("legitIntersections", legitIntersections)
+
+			if len(legitIntersections)%2 == 1 {
+				insidePoints[currentLocation] = true
+				insideCount++
+			}
+		}
+	}
+
+
+	log.Println("There are", insideCount, "points inside the loop")
+	
+	// printMap(input, visitedTiles, insidePoints)
 }
