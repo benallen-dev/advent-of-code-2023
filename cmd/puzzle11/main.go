@@ -37,7 +37,7 @@ func findDistanceInGiantUniverse(a Location, b Location, emptyLines []int, empty
 }
 
 func main() {
-	log.SetPrefix(color.Green + "[ # 01 ] " + color.Reset)
+	log.SetPrefix(color.Green + "[ # 11 ] " + color.Reset)
 	log.SetFlags(0)
 
 	input := readInput("input.txt")
