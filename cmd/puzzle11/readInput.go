@@ -25,6 +25,24 @@ func transpose(input []string) []string {
 	return output
 }
 
+func findEmptyLines(input []string) (emptyLines []int) {
+	emptyLines = []int{}
+
+	for i, line := range input {
+		if !galaxyRegex.MatchString(line) {
+			emptyLines = append(emptyLines, i)
+		}
+	}
+
+	return emptyLines
+}
+
+func findEmptyColumns(input []string) (emptyColumns []int) {
+	transposed := transpose(input)
+	
+	return findEmptyLines(transposed)
+}
+
 func duplicateEmptyLines(input []string) []string {
 	output := []string{}
 
@@ -65,9 +83,6 @@ func readInput(filename string) []string {
 
 	lines := strings.Split(string(fileContents), "\n")
 	lines = lines[:len(lines)-1] // Remove the last line because it's empty
-
-	// Expand the universe
-	lines = expandUniverse(lines)
 
 	return lines
 }
