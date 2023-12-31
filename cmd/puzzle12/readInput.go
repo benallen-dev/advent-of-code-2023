@@ -7,23 +7,6 @@ import (
 	"strconv"
 )
 
-// SpringGroup is a struct that holds the springs and groups of a given line
-//
-// springs is a string of . # and ? characters
-//   . = undamaged spring
-//   # = damaged spring
-//   ? = unknown spring
-// groups is a slice of integers that represent contiguous groups of damaged springs
-//
-// Example:
-//   .springs = ".#....##.??"
-//   .groups = [1, 2, 1]
-type SpringGroup struct {
-	springs string
-	groups []int
-}
-
-
 func readInput(filename string) []SpringGroup {
 	fileContents, err := os.ReadFile(filename)
 	if (err != nil) {
@@ -41,13 +24,13 @@ func readInput(filename string) []SpringGroup {
 		groups := strings.Split(parts[1], ",")
 		integers := []int{}
 
-		for i, group := range groups {
+		for _, group := range groups {
 			integer, err := strconv.Atoi(group)
 			if (err != nil) {
 				log.Panic("Cannot convert group to integer", err)
 			}
 
-			integers[i] = integer
+			integers = append(integers, integer)
 		}
 
 		springGroups = append(springGroups, SpringGroup{parts[0], integers})

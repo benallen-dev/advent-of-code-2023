@@ -10,9 +10,11 @@ func main() {
 	log.SetPrefix(color.Green + "[ # 12 ] " + color.Reset)
 	log.SetFlags(0)
 
-	input := readInput("example.txt")
+	springGroups := readInput("example.txt")
 
-	for _, line := range input {
-		log.Println(line)
+	for _, springGroup := range springGroups {
+		log.Println(springGroup)
+		log.Println(springGroup.Arrangements(), "arrangements")
+		log.Println()
 	}
 }
