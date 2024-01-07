@@ -38,3 +38,23 @@ func readInput(filename string) []SpringGroup {
 
 	return springGroups
 }
+
+// UnfoldRecords takes a slice of SpringGroup and returns a slice of SpringGroup where each SpringGroup has had both its groups and springs copied fivefold
+// RIP my memory and CPU time
+func unfoldRecords (springGroups[]SpringGroup) []SpringGroup {
+	unfoldedSpringGroups := []SpringGroup{}
+
+	for _, springGroup := range springGroups {
+		newSprings := ""
+		newGroups := []int{}
+
+		for i := 0; i < 5; i++ {
+			newSprings += springGroup.springs
+			newGroups = append(newGroups, springGroup.groups...)
+		}
+
+		unfoldedSpringGroups = append(unfoldedSpringGroups, SpringGroup{newSprings, newGroups})
+	}
+
+	return unfoldedSpringGroups
+}
