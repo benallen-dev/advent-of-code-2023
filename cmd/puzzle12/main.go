@@ -25,6 +25,9 @@ func main() {
 	// LOL doing this filled up 32GB of RAM in like 20 seconds
 	totalArrangementsPart2 := 0
 	for _, unfoldedSpringGroup := range unfoldedSpringGroups {
+		log.Printf("Unfolded spring group: %s", unfoldedSpringGroup)
+
+		log.Printf("Generating possibility tree...")
 		totalArrangementsPart2 += unfoldedSpringGroup.Arrangements()
 	}
 
