@@ -18,18 +18,36 @@ func main() {
 	}
 
 	log.Printf("Total arrangements part 1: %d", totalArrangements)
-	
+
 	// Now for the painful bit where my ineficcieny is punished
-	unfoldedSpringGroups := unfoldRecords(springGroups)
-
 	// LOL doing this filled up 32GB of RAM in like 20 seconds
-	totalArrangementsPart2 := 0
-	for _, unfoldedSpringGroup := range unfoldedSpringGroups {
-		log.Printf("Unfolded spring group: %s", unfoldedSpringGroup)
+	
+	// This is just straight-up not going to work because the numbers are too big.
+	// The first line alone contains 49 "?" characters, which means 2^49 possibilities.
+	// Even if you stop generating the tree once the groups no longer match that's still
+	// an astronomical number.
 
-		log.Printf("Generating possibility tree...")
-		totalArrangementsPart2 += unfoldedSpringGroup.Arrangements()
-	}
+	// William Y. Feng says in this video that he solved it using dynamic programming.
+	// https://www.youtube.com/watch?v=veJvlIMjv94
+	// Which is cool because I've heard of dynamic programming but I have yet to actually use it.
+	// I think I've bashed my head against the wall enough to call this a learning opportunity
+	// and try to implement his solution (originally in Python) in Go.
 
-	log.Printf("Total arrangements part 2: %d", totalArrangementsPart2)
+	// This is the code I initially used to try and solve the problem, left here for posterity.
+	// Feel free to laugh at me for being so naive, I learned a lot!
+	// unfoldedSpringGroups := unfoldRecords(springGroups)
+	// totalArrangementsPart2 := 0
+	//
+	// for idx, unfoldedSpringGroup := range unfoldedSpringGroups {
+	// 	log.Printf("Unfolded spring group: %s", unfoldedSpringGroup)
+	//
+	// 	log.Printf("Generating possibility tree...")
+	// arrangements := unfoldedSpringGroup.Arrangements()
+	// log.Printf("Line %d of %d: %d", idx, len(unfoldedSpringGroups), arrangements)
+	//
+	// totalArrangementsPart2 += arrangements
+	//
+	// }
+
+	// log.Printf("Total arrangements part 2: %d", totalArrangementsPart2)
 }

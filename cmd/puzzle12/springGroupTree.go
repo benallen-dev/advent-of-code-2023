@@ -30,33 +30,17 @@ func (node SpringGroupTreeNode) String() string {
 func generateTreeNode(springs string, groups []int) *SpringGroupTreeNode {
 	newNode := SpringGroupTreeNode{springs, nil, nil}
 
-	// 	if !strings.Contains(springs, "?") {
-	// 		return &newNode
-	// 	}
+	if !strings.Contains(springs, "?") {
+		return &newNode
+	}
 
 	// Check groups until the first "?"
 	partial, _, found := strings.Cut(springs, "?")
-
 	if !found {
 		return &newNode
 	}
 
-	log.Printf("Partial: %s", partial)
-
-	partialGroups, err := getGroupNumbers(partial)
-	if err != nil {
-		log.Println(color.Red + "ERROR: " + color.Reset + err.Error())
-	}
-
-	log.Printf("Partial: %s", partial)
-	log.Printf("Partial groups: %v", partialGroups)
-
-	// If we've made too many groups, nope outta there
-	if len(partialGroups) > len(groups) {
-		return nil
-	}
-
-	// Special case where you can just blindly add both
+	// Special case where you can just blindly add both because the first char is a ?
 	if len(partial) == 0 {
 		newLeftSprings := strings.Replace(springs, "?", ".", 1)  // replace first "?" with "."
 		newRightSprings := strings.Replace(springs, "?", "#", 1) // replace first "?" with "#"
@@ -67,12 +51,25 @@ func generateTreeNode(springs string, groups []int) *SpringGroupTreeNode {
 		return &newNode
 	}
 
+	partialGroups, err := getGroupNumbers(partial)
+	if err != nil {
+		log.Println(color.Yellow + "WARN: " + color.Reset + err.Error())
+		return nil
+	}
+
+	// If we've made too many groups, nope outta there
+	if len(partialGroups) > len(groups) {
+		// log.Printf(color.Gray + "DEBUG: " + color.Reset + "Too many groups for %s %v", partial, groups)
+		return nil
+	}
+
 	lastRune := rune(partial[len(partial)-1])
 
 	// Now let's check the groups one by one
 	for idx, partialGroup := range partialGroups {
 		// If one of the groups is too big, return nil
 		if partialGroup > groups[idx] {
+			// log.Printf(color.Gray + "DEBUG: " + color.Reset + "Group %d is too big for %s %v", idx, partial, groups)
 			return nil
 		}
 
@@ -109,9 +106,6 @@ func generateTreeNode(springs string, groups []int) *SpringGroupTreeNode {
 			newLeftSprings := strings.Replace(springs, "?", ".", 1) // replace first "?" with "."
 			newNode.left = generateTreeNode(newLeftSprings, groups)
 		}
-
-		// If the last partial group is greater than the target, we've made a mistake
-		return nil
 	}
 	// Part01 code starts here
 	// newLeftSprings := strings.Replace(springs, "?", ".", 1)  // replace first "?" with "."

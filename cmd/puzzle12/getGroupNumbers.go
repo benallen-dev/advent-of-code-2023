@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
 
@@ -13,6 +14,10 @@ func getGroupNumbers(springs string) ([]int, error) {
 	
 	var previousSpring rune
 
+	if strings.Contains(springs, "?") {
+		return []int{}, fmt.Errorf("getGroupNumbers: cannot handle string with '?' character: %s", springs)
+	}
+
 	for idx, spring := range springs {
 		if spring == '#' {
 			currentGroup++
@@ -22,7 +27,7 @@ func getGroupNumbers(springs string) ([]int, error) {
 				currentGroup = 0
 			}
 		} else {
-			return nil, fmt.Errorf("getGroupNumbers: invalid spring character: %c", spring)
+			return nil, fmt.Errorf("getGroupNumbers: invalid spring character: '%c' in %s, index %d", spring, springs, idx)
 		}
 
 		if idx == len(springs) - 1 && currentGroup > 0 {

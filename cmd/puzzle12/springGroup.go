@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/benallen-dev/advent-of-code-2023/pkg/color"
 )
@@ -27,13 +28,25 @@ func (sg SpringGroup) String() string {
 	return fmt.Sprintf("%s %v", sg.springs, sg.groups)
 }
 
-func (sg SpringGroup) GeneratePossibilityTree() SpringGroupTreeNode {
-	return *generateTreeNode(sg.springs, sg.groups)
+func (sg SpringGroup) GeneratePossibilityTree() (SpringGroupTreeNode, error) {
+	rootNode := generateTreeNode(sg.springs, sg.groups)
+	if rootNode == nil {
+		log.Println(color.Red + "ERROR: " + color.Reset + "sg.springs: " + sg.springs)
+		log.Println(color.Red + "ERROR: " + color.Reset + "sg.groups: " + fmt.Sprintf("%v", sg.groups))
+
+		return SpringGroupTreeNode{}, fmt.Errorf("rootNode is nil")
+	}
+
+	return *rootNode, nil
+	//return *generateTreeNode(sg.springs, sg.groups)
 }
 
 func (sg SpringGroup) Arrangements() int {
 	// generate all possible arrangements of springs
-	possibilityTree := sg.GeneratePossibilityTree()
+	possibilityTree, err := sg.GeneratePossibilityTree()
+	if err != nil {
+		log.Fatal(color.Red + "ERROR: " + color.Reset + err.Error())
+	}
 
 	// Find all the leaves
 	leaves := []string{}
@@ -60,6 +73,11 @@ func (sg SpringGroup) Arrangements() int {
 
 	// For each leaf, generate the associated group numbers and compare to sg.groups
 	for _, leaf := range leaves {
+		if strings.Contains(leaf, "?") {
+			// Not a legit leaf but an optimised branch that was skipped
+			continue
+		}
+
 		leafGroups, err := getGroupNumbers(leaf)
 		if err != nil {
 			log.Println(color.Red + "ERROR: " + color.Reset + err.Error())
