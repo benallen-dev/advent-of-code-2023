@@ -1,12 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/benallen-dev/advent-of-code-2023/pkg/color"
+)
+
+var (
+	resultCache = sync.Map{}
 )
 
 // Recursive solution by HyperNeutrino that finally got me unstuck
@@ -27,6 +32,12 @@ func count(cfg string, nums []int, debug bool) int {
 		} else {
 			return 1
 		}
+	}
+
+	// Check the cache
+	key := cfg + fmt.Sprintf("%v", nums)
+	if result, ok := resultCache.Load(key); ok {
+		return result.(int)
 	}
 
 	result := 0
@@ -63,6 +74,9 @@ func count(cfg string, nums []int, debug bool) int {
 		log.Printf("%s %v: %d", cfg, nums, result)
 	}
 
+	// Cache the result
+	resultCache.Store(key, result)
+
 	return result
 }
 
@@ -75,7 +89,7 @@ func startWorker(workChannel chan SpringGroup, resultChannel chan int, wg *sync.
 
 	for {
 		select {
-		case springGroup, ok := <- workChannel:
+		case springGroup, ok := <-workChannel:
 			if !ok {
 				log.Println("Not ok?")
 				return
@@ -84,11 +98,11 @@ func startWorker(workChannel chan SpringGroup, resultChannel chan int, wg *sync.
 			result := count(springGroup.springs, springGroup.groups, false)
 			resultCount++
 
-			log.Printf("[ Worker %d :: %03d ] %d", workerId, resultCount, result)
+		//	log.Printf("[ Worker %d :: %03d ] %d", workerId, resultCount, result)
 
 			resultChannel <- result
 		default:
-			log.Println("Default case, guess the queue is empty. Killing worker", workerId)
+			log.Println("Queue empty, stopping worker", workerId)
 			return
 		}
 	}
@@ -131,6 +145,8 @@ func main() {
 	unfoldedSpringGroups := unfoldRecords(springGroups)
 	totalArrangementsPart2 := 0
 
+	startTimePart2 := time.Now()
+
 	// Let's try some threading and stuff
 	// This will undoubtedly cause headaches when I try to add caching to the
 	// count function but just for the lulz for now
@@ -158,8 +174,12 @@ func main() {
 
 	for result := range resultChannel {
 		totalArrangementsPart2 += result
+
 		log.Printf("[ main            ] %d items remaining", len(workChannel))
 	}
 
 	log.Printf("Total arrangements part 2: %d", totalArrangementsPart2)
+	log.Printf("Time taken: %s", time.Since(startTimePart2))
+
+	// What's especially funny is that running 4 workers is only about 100ms faster than running 1
 }
