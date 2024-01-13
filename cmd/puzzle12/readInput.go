@@ -50,6 +50,9 @@ func unfoldRecords (springGroups[]SpringGroup) []SpringGroup {
 
 		for i := 0; i < 5; i++ {
 			newSprings += springGroup.springs
+			if i != 4 {
+				newSprings += "?"
+			}
 			newGroups = append(newGroups, springGroup.groups...)
 		}
 
