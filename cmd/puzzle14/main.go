@@ -8,8 +8,10 @@ import (
 	"github.com/benallen-dev/advent-of-code-2023/pkg/strutil"
 )
 
+var cycleCache = map[string][]string{}
+
 func calculateLoad(foo []string) (load int) {
-	
+
 	for i, line := range foo {
 		rockLoad := len(foo) - i
 		// count number of O's in line
@@ -23,49 +25,43 @@ func calculateLoad(foo []string) (load int) {
 	return load
 }
 
-func shiftNorth(pattern []string) (shifted []string) {
-
-	// Create strings from the columns of pattern
-	columnStrings := strutil.Transpose(pattern)
-
-	// Split the strings on the '#' character
-	for _, column := range columnStrings {
-		groups := strings.Split(column, "#")
-		newGroups := []string{}
-		
-		for _, group := range groups {
-
-			// Count O's
-			oCount := 0
-			for _, char := range group {
-				if char == 'O' {
-					oCount++
-				}
-			}
-
-			// Bunch em up at the beginning
-			newString := strings.Repeat("O", oCount) + strings.Repeat(".", len(group)-oCount)
-			newGroups = append(newGroups, newString)
-		}
-
-		// Join the groups back together with '#' characters
-		newColumn := strings.Join(newGroups, "#")
-		shifted = append(shifted, newColumn)
+func cycle(pattern []string) (cycled []string) {
+	// Check cache	
+	key := strings.Join(pattern, "")
+	if cached, ok := cycleCache[key]; ok {
+		return cached
 	}
 
-	// transpose the shifted pattern
-	shifted = strutil.Transpose(shifted)
+	cycled = shiftNorth(pattern)
+	cycled = shiftWest(cycled)
+	cycled = shiftSouth(cycled)
+	cycled = shiftEast(cycled)
 
-	return shifted
+	// Cache the result
+	cycleCache[key] = cycled
+
+	return cycled
+}
+
+func mirrorHorizontal(pattern []string) (mirrored []string) {
+	for _, line := range pattern {
+		mirrored = append(mirrored, strutil.Reverse(line))
+	}
+
+	return mirrored
+}
+
+func printPattern(pattern []string) {
+	for _, line := range pattern {
+		log.Println(line)
+	}
 }
 
 func main() {
 	log.SetPrefix(color.Green + "[ # 14 ] " + color.Reset)
 	log.SetFlags(0)
 
-	input := readInput("input.txt")
-
-	shifted := shiftNorth(input)
+	input := readInput("example.txt")
 
 	// exampleShifted := []string{
 	// 	"OOOO.#.O..",
@@ -80,5 +76,20 @@ func main() {
 	// 	"#....#....",
 	// }
 
-	log.Println("Part 1: ", calculateLoad(shifted))
+	log.Println("Part 1: ", calculateLoad(shiftNorth(input)))
+	log.Println()
+
+	cycled := input
+
+	for i := 0; i < 1_000_000_000; i++ {
+		if i%100_000 == 0 && i != 0 {
+			percentDone := float32(i) / float32(1_000_000_0)
+			log.Println("Progress:", percentDone, "%")
+		}
+
+		cycled = cycle(cycled)
+	}
+
+	log.Println("Part 2: ", calculateLoad(cycled))
+
 }
