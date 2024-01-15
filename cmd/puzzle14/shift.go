@@ -2,21 +2,22 @@ package main
 
 import (
 	"strings"
-	"log"
+
+	"crypto/sha1"
 
 	"github.com/benallen-dev/advent-of-code-2023/pkg/strutil"
 )
 
 var (
-	shiftLeftCache = map[string]string{}
+	shiftLeftCache = map[[20]byte]string{}
 )
 
 func shiftLeft(pattern []string) (shifted []string) {
 	// Split the strings on the '#' character
 	for _, line := range pattern {
+		key := sha1.Sum([]byte(line))
 
-		if cached, ok := shiftLeftCache[line]; ok {
-			log.Println("Cache hit!")
+		if cached, ok := shiftLeftCache[key]; ok {
 			shifted = append(shifted, cached)
 			continue
 		}
@@ -44,9 +45,7 @@ func shiftLeft(pattern []string) (shifted []string) {
 		shifted = append(shifted, newColumn)
 
 		// Cache the result
-		shiftLeftCache[line] = newColumn
-		// print size of cache
-		log.Println("Cache size:", len(shiftLeftCache))
+		shiftLeftCache[key] = newColumn
 	}
 
 	return shifted
