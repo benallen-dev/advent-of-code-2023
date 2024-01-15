@@ -2,8 +2,10 @@ package main
 
 import (
 	"log"
+	"strings"
 
 	"github.com/benallen-dev/advent-of-code-2023/pkg/color"
+	"github.com/benallen-dev/advent-of-code-2023/pkg/strutil"
 )
 
 func calculateLoad(foo []string) (load int) {
@@ -21,28 +23,62 @@ func calculateLoad(foo []string) (load int) {
 	return load
 }
 
+func shiftNorth(pattern []string) (shifted []string) {
+
+	// Create strings from the columns of pattern
+	columnStrings := strutil.Transpose(pattern)
+
+	// Split the strings on the '#' character
+	for _, column := range columnStrings {
+		groups := strings.Split(column, "#")
+		newGroups := []string{}
+		
+		for _, group := range groups {
+
+			// Count O's
+			oCount := 0
+			for _, char := range group {
+				if char == 'O' {
+					oCount++
+				}
+			}
+
+			// Bunch em up at the beginning
+			newString := strings.Repeat("O", oCount) + strings.Repeat(".", len(group)-oCount)
+			newGroups = append(newGroups, newString)
+		}
+
+		// Join the groups back together with '#' characters
+		newColumn := strings.Join(newGroups, "#")
+		shifted = append(shifted, newColumn)
+	}
+
+	// transpose the shifted pattern
+	shifted = strutil.Transpose(shifted)
+
+	return shifted
+}
+
 func main() {
 	log.SetPrefix(color.Green + "[ # 14 ] " + color.Reset)
 	log.SetFlags(0)
 
 	input := readInput("input.txt")
 
-	for _, line := range input {
-		log.Println(line)
-	}
+	shifted := shiftNorth(input)
 
-	shifted := []string{
-		"OOOO.#.O..",
-		"OO..#....#",
-		"OO..O##..O",
-		"O..#.OO...",
-		"........#.",
-		"..#....#.#",
-		"..O..#.O.O",
-		"..O.......",
-		"#....###..",
-		"#....#....",
-	}
+	// exampleShifted := []string{
+	// 	"OOOO.#.O..",
+	// 	"OO..#....#",
+	// 	"OO..O##..O",
+	// 	"O..#.OO...",
+	// 	"........#.",
+	// 	"..#....#.#",
+	// 	"..O..#.O.O",
+	// 	"..O.......",
+	// 	"#....###..",
+	// 	"#....#....",
+	// }
 
 	log.Println("Part 1: ", calculateLoad(shifted))
 }
