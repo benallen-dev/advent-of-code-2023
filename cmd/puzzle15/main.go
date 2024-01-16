@@ -15,4 +15,12 @@ func main() {
 	for _, step := range steps {
 		log.Println(step)
 	}
+
+	total := 0
+
+	for _, step := range steps {
+		total += hash(step)
+	}
+
+	log.Println(total)
 }
