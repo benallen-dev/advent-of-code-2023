@@ -4,9 +4,6 @@ import (
 	"log"
 )
 
-// If we've come from the flat side of a splitter before we don't need to re-add the pointy ends to the queue
-var visitedSplitters = map[Position]bool{}
-
 func processTile(queueItem QueueItem) {
 	position := queueItem.position
 	previousPosition := queueItem.previousPosition
