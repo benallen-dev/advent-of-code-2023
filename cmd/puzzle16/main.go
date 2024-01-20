@@ -22,12 +22,24 @@ func isOutOfBounds(p Position) bool {
 	return p[0] < 0 || p[1] < 0 || p[0] >= len(tileMap) || p[1] >= len(tileMap[0])
 }
 
+func countEnergizedTiles() int {
+	count := 0
+	for _, row := range energizedTiles {
+		for _, tile := range row {
+			if tile > 0 {
+				count++
+			}
+		}
+	}
+	return count
+}
+
 // This program is at total mess lol
 func main() {
 	log.SetPrefix(color.Green + "[ # 16 ] " + color.Reset)
 	log.SetFlags(0)
 
-	input := readInput("example.txt")
+	input := readInput("input.txt")
 	for i, line := range input {
 		// initialise the maps
 		tileMap = append(tileMap, make([]rune, len(line)))
@@ -46,8 +58,10 @@ func main() {
 		queueItem := positionQueue.pop()
 		processTile(queueItem)
 
-		fmt.Println(tileMap.PrintWithEnergy(energizedTiles))
 	}
+	fmt.Println(tileMap.PrintWithEnergy(energizedTiles))
+
+	log.Println("Energized tiles:", countEnergizedTiles())
 
 	log.Println("Done")
 }
