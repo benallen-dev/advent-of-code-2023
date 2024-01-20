@@ -34,6 +34,27 @@ func countEnergizedTiles() int {
 	return count
 }
 
+func testConfiguration(tileMap TileMap, position Position, previousPosition Position) int {
+	for i, line := range tileMap {
+		energizedTiles = append(energizedTiles, make([]int, len(line)))
+
+		for ii := range line {
+			energizedTiles[i][ii] = 0
+		}
+	}
+
+	positionQueue.initWith(position, previousPosition)
+
+	for !positionQueue.isEmpty() {
+		queueItem := positionQueue.pop()
+		processTile(queueItem)
+	}
+
+	count := countEnergizedTiles()
+	fmt.Println("Energized tiles:", count)
+	return count
+}
+
 // This program is at total mess lol
 func main() {
 	log.SetPrefix(color.Green + "[ # 16 ] " + color.Reset)
@@ -43,25 +64,15 @@ func main() {
 	for i, line := range input {
 		// initialise the maps
 		tileMap = append(tileMap, make([]rune, len(line)))
-		energizedTiles = append(energizedTiles, make([]int, len(line)))
 
 		// Get rekt j-lovers we're using ii
 		for ii, char := range line {
 			tileMap[i][ii] = char
-			energizedTiles[i][ii] = 0
 		}
 	}
 
-	positionQueue.initWith(Position{0, 0}, Position{0, -1})
-
-	for !positionQueue.isEmpty() {
-		queueItem := positionQueue.pop()
-		processTile(queueItem)
-
-	}
-	fmt.Println(tileMap.PrintWithEnergy(energizedTiles))
-
-	log.Println("Energized tiles:", countEnergizedTiles())
+	part01 := testConfiguration(tileMap, Position{0, 0}, Position{0, -1})
+	log.Println("Part 01:", part01)
 
 	log.Println("Done")
 }
