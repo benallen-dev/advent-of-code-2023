@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"os"
@@ -8,11 +9,17 @@ import (
 )
 
 type GraphEdge struct {
+	from int
 	to int
 	weight int
 }
 
-func createEdge(line int, col int, input []string) GraphEdge {
+func (e GraphEdge) String() string {
+
+	return fmt.Sprintf("%d -> %d (%d)", e.from, e.to, e.weight)
+}
+
+func createEdge(line int, col int, input []string, from int) GraphEdge {
 	// This function fully assumes you're not passing out of bounds lines or columns
 
 	number := (line * len(input[0]) + col)
@@ -21,7 +28,12 @@ func createEdge(line int, col int, input []string) GraphEdge {
 		log.Panic("Cannot convert weight to int", err)
 	}
 
-	return GraphEdge{number, weight}
+	return GraphEdge{
+		from: from,
+		to: number,
+		weight: weight,
+	}
+
 }
 
 func buildAdjecencyList(input []string) [][]GraphEdge {
@@ -36,22 +48,22 @@ func buildAdjecencyList(input []string) [][]GraphEdge {
 
 			// It has four potential edges
 			if i > 0 {
-				newEdge := createEdge(i-1, j, input)
+				newEdge := createEdge(i-1, j, input, nodeNumber)
 				out[nodeNumber] = append(out[nodeNumber], newEdge)
 			}
 
 			if i < len(input) - 1 {
-				newEdge := createEdge(i+1, j, input)
+				newEdge := createEdge(i+1, j, input, nodeNumber)
 				out[nodeNumber] = append(out[nodeNumber], newEdge)
 			}
 
 			if j > 0 {
-				newEdge := createEdge(i, j-1, input)
+				newEdge := createEdge(i, j-1, input, nodeNumber)
 				out[nodeNumber] = append(out[nodeNumber], newEdge)
 			}
 
 			if j < len(input[0]) - 1 {
-				newEdge := createEdge(i, j+1, input)
+				newEdge := createEdge(i, j+1, input, nodeNumber)
 				out[nodeNumber] = append(out[nodeNumber], newEdge)
 			}
 		}
