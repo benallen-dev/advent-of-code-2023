@@ -49,23 +49,39 @@ func main() {
 
 	log.Printf("Source: %d, Target: %d", source, target)
 
-	for hasUnvisited() == true {
-		lo := getLowestUnvisited()
-		seen[lo] = true
 
-		edges := adjs[lo]
+	// Let's test the minheap for a sec
 
-		// adjust the adj to take the 'no more than 3 steps in one direction'
-		// rule into account
-		for i, edge := range edges {
-			if seen[i] {
-				continue
-			}
 
-			dist := dists[lo] + edge.weight
-			if dist < dists[i] {
-				dists[edge.from] = dist
-			}
-		}
+	// Build a minheap of all the distances
+	minheap := NewMinheap()
+	for i := range adjs {
+		minheap.Insert(i, math.MaxInt)
 	}
+
+	// Update the source node to have a distance of 0
+	minheap.Update(source, 0)
+
+
+
+// 	// Time to algorithm!
+// 	for hasUnvisited() == true {
+// 		lo := getLowestUnvisited()
+// 		seen[lo] = true
+
+// 		edges := adjs[lo]
+
+// 		// adjust the adj to take the 'no more than 3 steps in one direction'
+// 		// rule into account
+// 		for i, edge := range edges {
+// 			if seen[i] {
+// 				continue
+// 			}
+
+// 			dist := dists[lo] + edge.weight
+// 			if dist < dists[i] {
+// 				dists[edge.from] = dist
+// 			}
+// 		}
+// 	}
 }

@@ -1,23 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"strconv"
 	"os"
 	"strings"
 )
-
-type GraphEdge struct {
-	from int
-	to int
-	weight int
-}
-
-func (e GraphEdge) String() string {
-
-	return fmt.Sprintf("%d -> %d (%d)", e.from, e.to, e.weight)
-}
 
 func createEdge(line int, col int, input []string, from int) GraphEdge {
 	// This function fully assumes you're not passing out of bounds lines or columns
