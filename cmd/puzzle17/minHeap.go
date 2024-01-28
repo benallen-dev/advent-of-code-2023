@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"log"
 )
 
 type MinheapNode struct {
@@ -123,10 +122,22 @@ func (h *Minheap) Pop() (out MinheapNode, err error) {
 	return out, nil
 }
 
-// TODO: Implement this function
 func (h *Minheap) Update(idx int, dist int) {
 	// Find the node that has Node.idx == idx
-	// Update the distance
-	// Bubble depending on whether the new distance is smaller or larger
-	log.Panic("Not implemented: Update")
+	// Linear search for now?
+	var node MinheapNode
+	for _, n := range h.data {
+		if n.idx == idx {
+			node = n
+		}
+	}
+
+	oldDist := node.dist
+	node.dist = dist
+
+	if oldDist < dist {
+		h.bubbleDown(node.idx)
+	} else if oldDist > dist {
+		h.bubbleUp(node.idx)
+	}
 }	
