@@ -37,6 +37,7 @@ func TestUpdate(t *testing.T) {
 	minheap := NewMinheap()
 
 	// Let's insert some values, idx not important but dist is
+	minheap.Insert(9, 69420)
 	minheap.Insert(0, 10)	
 	minheap.Insert(1, 2)
 	minheap.Insert(2, 9)
@@ -47,18 +48,26 @@ func TestUpdate(t *testing.T) {
 	minheap.Insert(7, 8)
 	minheap.Insert(8, 7)
 
-	t.Logf("Minheap: %v", minheap)
+	t.Logf("Minheap:                   %v", minheap)
 
-	minheap.Update(0, 1)
+	minheap.Update(8, 1)
+	t.Logf("Minheap after Update(8,1): %v", minheap)
 
-	t.Logf("Minheap: %v", minheap)
+	// We now expect
+	// [{1 2} {8 1} {5 3} {6 4} {4 5} {3 6} {2 9} {7 8} {0 10}] - ish
+	// pop should return 1
+
 	min, err := minheap.Pop()
 
 	if err != nil {
 		t.Errorf("Error popping minheap: %s", err)
 	}
 
+	t.Logf("min: %v", min)
+
 	if min.dist != 1 {
 		t.Errorf("Expected 1, got %d", min.dist)
 	}
+
+
 }

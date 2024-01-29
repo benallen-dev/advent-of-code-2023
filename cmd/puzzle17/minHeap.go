@@ -2,22 +2,95 @@ package main
 
 import (
 	"errors"
+	"fmt"
+	"log"
 )
 
 type MinheapNode struct {
-	idx int
+	idx  int
 	dist int
+}
+
+func (n MinheapNode) String() string {
+	return "{idx: " + fmt.Sprint(n.idx) + ", dist: " + fmt.Sprint(n.dist) + "}"
 }
 
 type Minheap struct {
 	length int
-	data []MinheapNode // The data is the index of the node
+	data   []MinheapNode // The data is the index of the node
 }
 
 func NewMinheap() Minheap {
 	return Minheap{
 		length: 0,
-		data: []MinheapNode{},
+		data:   []MinheapNode{},
+	}
+}
+
+func (h *Minheap) Insert(idx int, dist int) {
+	h.data = append(h.data, MinheapNode{idx: idx, dist: dist})
+	h.length++
+	h.bubbleUp(h.length - 1)
+}
+
+func (h *Minheap) Pop() (out MinheapNode, err error) {
+	if h.length == 0 {
+		return MinheapNode{idx: -1, dist: -1}, errors.New("Heap is empty")
+	}
+
+	out = h.data[0]
+
+	if h.length == 1 {
+		h.data = []MinheapNode{}
+		h.length = 0
+		return out, nil
+	}
+
+	lastElement := h.data[len(h.data)-1]
+
+	// Take the last element
+	h.data[0] = lastElement
+	h.data = h.data[:len(h.data)-1]
+	h.length--
+	h.bubbleDown(0)
+
+	return out, nil
+}
+
+func (h *Minheap) Update(idx int, newDist int) {
+	var node *MinheapNode // The node we need to update
+	var heapIndex int     // The position in the heap array where the target node is
+
+	// Linear search for now I think
+	for i := 0; i < h.length; i++ {
+		n := h.data[i]
+
+		if n.idx == idx {
+			heapIndex = i
+			node = &n
+			break
+		}
+	}
+
+	if node == nil { // aww yiss, pointer magic
+		log.Printf("Node not found")
+		return
+	}
+
+	// Update the node
+	oldDist := node.dist
+	node.dist = newDist
+
+	// For some reason the address changes so we explicitly need to change it
+	// I was hoping passing a pointer to the array element would be enough
+	// but no dice
+	h.data[heapIndex] = *node
+
+	// Bubble
+	if oldDist < newDist {
+		h.bubbleDown(heapIndex)
+	} else if oldDist > newDist {
+		h.bubbleUp(heapIndex)
 	}
 }
 
@@ -26,11 +99,11 @@ func (h *Minheap) parent(index int) int {
 }
 
 func (h *Minheap) leftChild(index int) int {
-	return index * 2 + 1
+	return index*2 + 1
 }
 
 func (h *Minheap) rightChild(index int) int {
-	return index * 2 + 2
+	return index*2 + 2
 }
 
 func (h *Minheap) swap(index1 int, index2 int) {
@@ -91,53 +164,3 @@ func (h *Minheap) bubbleDown(index int) {
 		h.bubbleDown(lIdx)
 	}
 }
-	
-func (h *Minheap) Insert(idx int, dist int) {
-	h.data = append(h.data, MinheapNode{idx: idx, dist: dist})
-	h.length++
-	h.bubbleUp(h.length - 1)
-}
-
-func (h *Minheap) Pop() (out MinheapNode, err error) {
-	if h.length == 0 {
-		return MinheapNode{idx: -1, dist: -1}, errors.New("Heap is empty")
-	}
-
-	out = h.data[0]
-
-	if h.length == 1 {
-		h.data = []MinheapNode{}
-		h.length = 0
-		return out, nil
-	}
-
-	lastElement := h.data[len(h.data) - 1]
-
-	// Take the last element
-	h.data[0] = lastElement
-	h.data = h.data[:len(h.data) - 1]
-	h.length--
-	h.bubbleDown(0)
-
-	return out, nil
-}
-
-func (h *Minheap) Update(idx int, dist int) {
-	// Find the node that has Node.idx == idx
-	// Linear search for now?
-	var node MinheapNode
-	for _, n := range h.data {
-		if n.idx == idx {
-			node = n
-		}
-	}
-
-	oldDist := node.dist
-	node.dist = dist
-
-	if oldDist < dist {
-		h.bubbleDown(node.idx)
-	} else if oldDist > dist {
-		h.bubbleUp(node.idx)
-	}
-}	
