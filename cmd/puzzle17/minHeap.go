@@ -57,41 +57,70 @@ func (h *Minheap) Pop() (out MinheapNode, err error) {
 	return out, nil
 }
 
+func (h *Minheap) deleteByIdx(heapIdx int) error {
+	if heapIdx >= h.length {
+		return errors.New("Index out of bounds")
+	}
+
+	if h.length == 0 {
+		return errors.New("Heap is empty")
+	}
+
+	if h.length == 1 {
+		h.data = []MinheapNode{}
+		h.length = 0
+		return nil
+	}
+
+	node := h.data[heapIdx]
+
+	node.dist = -1
+	h.data[heapIdx] = node
+	h.bubbleUp(heapIdx)
+
+	check, err := h.Pop()
+	if err != nil {
+		return err
+	}
+
+	if check.idx != node.idx {
+		log.Printf("check: %v, node: %v", check, node)
+		return errors.New("Something went wrong")
+	}
+
+	if check.dist != -1 {
+		log.Printf("check: %v, node: %v", check, node)
+		return errors.New("Something went wrong")
+	}
+
+	return nil
+}
+
 func (h *Minheap) Update(idx int, newDist int) {
-	var node *MinheapNode // The node we need to update
-	var heapIndex int     // The position in the heap array where the target node is
+	// Delete the existing node
+	err := h.deleteByIdx(idx)
+	if err != nil {
+		log.Printf("[WARN] Update: node with idx %d not found", idx)
+	}
 
-	// Linear search for now I think
-	for i := 0; i < h.length; i++ {
-		n := h.data[i]
+	// Insert the new node
+	h.Insert(idx, newDist)
+}
 
-		if n.idx == idx {
-			heapIndex = i
-			node = &n
-			break
+// Get a node with a specific point index
+// The index in the heap array is not the same as the point index and
+// is not returned.
+func (h *Minheap) GetByIdx(idx int) (node MinheapNode, err error) {
+
+	// Linear search, could be improved with DFS but unless performance
+	// is an issue this is fine for now
+	for _, node := range h.data {
+		if node.idx == idx {
+			return node, nil
 		}
 	}
 
-	if node == nil { // aww yiss, pointer magic
-		log.Printf("Node not found")
-		return
-	}
-
-	// Update the node
-	oldDist := node.dist
-	node.dist = newDist
-
-	// For some reason the address changes so we explicitly need to change it
-	// I was hoping passing a pointer to the array element would be enough
-	// but no dice
-	h.data[heapIndex] = *node
-
-	// Bubble
-	if oldDist < newDist {
-		h.bubbleDown(heapIndex)
-	} else if oldDist > newDist {
-		h.bubbleUp(heapIndex)
-	}
+	return MinheapNode{idx: -1, dist: -1}, errors.New("Node not found")
 }
 
 func (h *Minheap) parent(index int) int {
@@ -140,6 +169,8 @@ func (h *Minheap) bubbleDown(index int) {
 
 	lValue := h.data[lIdx].dist
 	value := h.data[index].dist
+
+	log.Printf("lIdx: %d, rIdx: %d, lValue: %d, value: %d", lIdx, rIdx, lValue, value)
 
 	if rIdx >= h.length {
 		// We have no right child, but we do have a left child

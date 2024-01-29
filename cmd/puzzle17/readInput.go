@@ -60,7 +60,7 @@ func buildAdjecencyList(input []string) [][]GraphEdge {
 	return out
 }	
 
-func readInput(filename string) [][]GraphEdge {
+func readInput(filename string) ([][]GraphEdge, []string) {
 	fileBytes, err := os.ReadFile(filename)
 	if (err != nil) {
 		log.Panic("Cannot read input file from disk", err)
@@ -69,5 +69,5 @@ func readInput(filename string) [][]GraphEdge {
 	lines := strings.Split(string(fileBytes), "\n")
 
 	out := buildAdjecencyList(lines[:len(lines)-1])
-	return out
+	return out, lines
 }
